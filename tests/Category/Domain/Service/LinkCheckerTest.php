@@ -4,19 +4,19 @@ namespace App\Tests\Category\Domain\Service;
 
 use App\Category\Domain\Exception\CategoryIsUsedException;
 use App\Category\Domain\Service\LinkChecker;
-use App\Product\Application\ProductEntityProvider;
+use App\Shared\Application\EntityProvider;
 use App\Tests\AbstractTestCase;
 use App\Tests\MockUtils;
 
 class LinkCheckerTest extends AbstractTestCase
 {
-    private readonly ProductEntityProvider $entityProvider;
+    private readonly EntityProvider $entityProvider;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->entityProvider = $this->createMock(ProductEntityProvider::class);
+        $this->entityProvider = $this->createMock(EntityProvider::class);
     }
 
     public function testCheck(): void
@@ -25,7 +25,7 @@ class LinkCheckerTest extends AbstractTestCase
 
         $this->entityProvider->expects($this->any())
             ->method('getNotDeletedEntitiesByField')
-            ->with('category', $category)
+            ->with('App\Product\Domain\Product', 'category', $category)
             ->willReturn([]);
 
         $this->assertTrue($this->createService()->check($category));
@@ -41,7 +41,7 @@ class LinkCheckerTest extends AbstractTestCase
 
         $this->entityProvider->expects($this->any())
             ->method('getNotDeletedEntitiesByField')
-            ->with('category', $category)
+            ->with('App\Product\Domain\Product', 'category', $category)
             ->willReturn([$product]);
 
         $this->createService()->check($category);
@@ -49,8 +49,6 @@ class LinkCheckerTest extends AbstractTestCase
 
     private function createService(): LinkChecker
     {
-        return new LinkChecker(
-            $this->entityProvider
-        );
+        return new LinkChecker($this->entityProvider);
     }
 }

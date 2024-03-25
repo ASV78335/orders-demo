@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Attribute\RequestBody;
 use App\ControllerHelper\CommandDecorator;
 use App\ControllerHelper\ControllerHelper;
 use App\ControllerHelper\DecoratorFactory;
@@ -10,7 +11,6 @@ use App\Product\Application\Command\ProductCreateCommand;
 use App\Product\Application\Command\ProductUpdateCommand;
 use App\Product\Application\ProductHelper;
 use App\Product\Application\Query\ProductQueryInteractor;
-use App\Shared\Resources\Attribute\RequestBody;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;

@@ -2,10 +2,10 @@
 
 namespace App\Controller;
 
+use App\Attribute\RequestBody;
 use App\ControllerHelper\CommandDecorator;
 use App\ControllerHelper\ControllerHelper;
 use App\ControllerHelper\DecoratorFactory;
-use App\Shared\Resources\Attribute\RequestBody;
 use App\Unit\Application\Command\UnitCommandInteractor;
 use App\Unit\Application\Command\UnitCreateCommand;
 use App\Unit\Application\Command\UnitUpdateCommand;

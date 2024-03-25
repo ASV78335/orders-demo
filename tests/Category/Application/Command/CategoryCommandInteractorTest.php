@@ -49,7 +49,7 @@ class CategoryCommandInteractorTest extends AbstractTestCase
         ;
 
         $this->accessManager->expects($this->once())
-            ->method('canEdit')
+            ->method('canCreate')
             ->with($entities['person'])
             ->willReturn(true);
 
@@ -84,7 +84,7 @@ class CategoryCommandInteractorTest extends AbstractTestCase
         ;
 
         $this->accessManager->expects($this->once())
-            ->method('canEdit')
+            ->method('canCreate')
             ->with($entities['person'])
             ->willReturn(false);
 
@@ -102,11 +102,6 @@ class CategoryCommandInteractorTest extends AbstractTestCase
             ->setDescription('Test product description')
             ->setCode('1100')
         ;
-
-        $this->accessManager->expects($this->once())
-            ->method('canEdit')
-            ->with($entities['person'])
-            ->willReturn(true);
 
         $this->createInteractor()->create($entities['person'], $request);
     }
@@ -177,11 +172,6 @@ class CategoryCommandInteractorTest extends AbstractTestCase
             ->setDescription('Test product description')
             ->setCode('1100')
         ;
-
-        $this->accessManager->expects($this->once())
-            ->method('canEdit')
-            ->with($entities['person'])
-            ->willReturn(true);
 
         $this->createInteractor()->update($entities['person'], $request, $entities['category']->getUuid()->getStringValue());
     }

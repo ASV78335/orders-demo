@@ -2,17 +2,21 @@
 
 namespace App\Category\Domain;
 
+use App\AbstractContainer\Domain\Entity;
 use App\Category\Application\Command\CategoryCreateCommand;
 use App\Category\Application\Command\CategoryUpdateCommand;
 use App\Category\Application\Query\CategoryDetails;
 use App\Category\Application\Query\CategoryItem;
 use App\Category\Domain\ValueObject\CategoryUuid;
+use App\Shared\Application\Command\DTOCreateInterface;
+use App\Shared\Application\Command\DTOUpdateInterface;
+use App\Shared\Application\Exception\RequestParsingException;
 use DateTimeImmutable;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\HasLifecycleCallbacks]
 #[ORM\Entity]
-class Category
+class Category extends Entity
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -55,9 +59,12 @@ class Category
     }
 
 
-    public static function fromCreateRequest(CategoryCreateCommand $model, array $values): self
+    public static function fromCreateRequest(DTOCreateInterface $model, array $additionalValues): self
     {
-        extract($values);
+        if (!$model instanceof CategoryCreateCommand) throw new RequestParsingException();
+
+        extract($additionalValues);
+
         $category = new self();
         $category
             ->setUuid(new CategoryUuid())
@@ -71,11 +78,14 @@ class Category
         return $category;
     }
 
-    public static function fromUpdateRequest(Category $category, CategoryUpdateCommand $model, array $values): self
+    public static function fromUpdateRequest(Entity $entity, DTOUpdateInterface $model, array $additionalValues): self
     {
-        extract($values);
+        if (!$entity instanceof Category) throw new RequestParsingException();
+        if (!$model instanceof CategoryUpdateCommand) throw new RequestParsingException();
 
-        $category
+        extract($additionalValues);
+
+        $entity
             ->setName($model->getName())
             ->setSlug($slug)
             ->setDescription($model->getDescription())
@@ -83,7 +93,7 @@ class Category
             ->setParent($parent)
             ->setUpdatedAt(new DateTimeImmutable())
         ;
-        return $category;
+        return $entity;
     }
 
     public function toResponseItem(): CategoryItem

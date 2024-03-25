@@ -2,7 +2,9 @@
 
 namespace App\Product\Application\Query;
 
-class ProductList
+use App\Shared\Application\Query\DTOListInterface;
+
+class ProductList implements DTOListInterface
 {
     /**
      * @var ProductItem[]
@@ -23,5 +25,13 @@ class ProductList
     public function getItems(): array
     {
         return $this->items;
+    }
+
+    /**
+     * @param ProductItem[] $items
+     */
+    public function setItems(array $items): void
+    {
+        $this->items = $items;
     }
 }

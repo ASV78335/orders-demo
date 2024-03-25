@@ -24,9 +24,8 @@ class CommandDecorator implements CommandInterface
         DecoratorTrait::__construct as public __traitConstruct;
     }
 
-    public function create(
-        UserInterface $user,
-        DTOCreateInterface $request
+    public function create(UserInterface            $user,
+                           DTOCreateInterface      $request
     ): array
     {
         $result = $this->commandInteractor->create($user, $request);
@@ -41,10 +40,9 @@ class CommandDecorator implements CommandInterface
         return compact('entity', 'entityForm');
     }
 
-    public function update(
-        UserInterface $user,
-        DTOUpdateInterface $request,
-        string $uuid
+    public function update(UserInterface            $user,
+                           DTOUpdateInterface       $request,
+                           string                   $uuid
     ): array
     {
         $result = $this->commandInteractor->update($user, $request, $uuid);
@@ -59,9 +57,8 @@ class CommandDecorator implements CommandInterface
         return compact('entity', 'entityForm');
     }
 
-    public function delete(
-        UserInterface $user,
-        string $uuid)
+    public function delete(UserInterface    $user,
+                           string             $uuid)
     : void
     {
         $this->commandInteractor->delete($user, $uuid);

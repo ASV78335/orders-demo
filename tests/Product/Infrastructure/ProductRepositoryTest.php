@@ -11,7 +11,6 @@ use Symfony\Component\Uid\Uuid;
 class ProductRepositoryTest extends AbstractRepositoryTest
 {
     const PRODUCT_SLUG = 'Test-product';
-    private ProductRepository $repository;
 
     protected function setUp(): void
     {
@@ -89,7 +88,7 @@ class ProductRepositoryTest extends AbstractRepositoryTest
         $this->assertEquals(['Батон нарезной', 'Хлеб белый'], $names);
     }
 
-    public function testGetNotDeletedByPage()
+    public function testGetNotDeletedByPageSortedByName()
     {
         $entities = $this->createEntities();
         $entities['product']->makeDeleted();
@@ -111,7 +110,7 @@ class ProductRepositoryTest extends AbstractRepositoryTest
         }
         $this->em->flush();
 
-        $this->assertEquals([$product2, $product3], $this->repository->getNotDeletedByPage(0, 2));
+        $this->assertEquals([$product2, $product3], $this->repository->getNotDeletedByPageSortedByName(0, 2));
     }
 
     private function createEntities(): array

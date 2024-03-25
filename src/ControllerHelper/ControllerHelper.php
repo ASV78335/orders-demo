@@ -2,10 +2,11 @@
 
 namespace App\ControllerHelper;
 
-use App\Contragent\Domain\Contragent;
-use App\Person\Domain\Person;
-use App\Person\Domain\Exception\PersonAccessDeniedException;
-use App\EnvironmentPreparer\EnvironmentPreparer;
+use App\Entity\Contragent;
+use App\Entity\Person;
+use App\Exception\Person\PersonAccessDeniedException;
+use App\Service\IndexService;
+use App\Service\PersonService;
 use App\Shared\Application\EntityHelperInterface;
 use App\Shared\Application\PaginationTrait;
 use App\Shared\Application\Query\QueryInterface;
@@ -24,7 +25,8 @@ class ControllerHelper
 
     public function __construct(
         private readonly FormFactoryInterface $formFactory,
-        private readonly EnvironmentPreparer $environmentPreparer,
+        private readonly IndexService $indexService,
+        private readonly PersonService $personService,
         private readonly RequestStack $requestStack,
         private readonly Security $security
     )
@@ -34,9 +36,8 @@ class ControllerHelper
 
     use PaginationTrait;
 
-    public function getNewFormData(
-        UserInterface $user,
-        EntityHelperInterface $entityHelper
+    public function getNewFormData(UserInterface            $user,
+                                   EntityHelperInterface    $entityHelper
     ): array
     {
         $entity = $entityHelper->getNewDetails();
@@ -47,11 +48,10 @@ class ControllerHelper
         return compact('entity', 'entityForm');
     }
 
-    public function getFormData(
-        UserInterface $user,
-        QueryInterface $queryInteractor,
-        EntityHelperInterface $entityHelper,
-        Uuid $uuid
+    public function getFormData(UserInterface           $user,
+                                QueryInterface          $queryInteractor,
+                                EntityHelperInterface   $entityHelper,
+                                Uuid                    $uuid
     ): array
     {
         $entity = $queryInteractor->getDetails($user, $uuid);
@@ -65,7 +65,7 @@ class ControllerHelper
     public function getEnvironment($request): array
     {
         $personForm = $this->getPersonForm($request)->createView();
-        $data = $this->environmentPreparer->getData();
+        $data = $this->indexService->getData();
 
         return compact('data', 'personForm');
     }
@@ -88,7 +88,7 @@ class ControllerHelper
         $person = $this->security->getUser();
         if (!$person instanceof Person) throw new PersonAccessDeniedException();
 
-        $contragents = $this->environmentPreparer->getContragents();
+        $contragents = $this->indexService->getContragents();
         sort($contragents);
 
         $personForm = $this->createForm('CurrentContragent', $person, [
@@ -119,7 +119,7 @@ class ControllerHelper
 
             $person = $personForm->getData();
             try {
-                $person->saveCurrentContragent();
+                $this->personService->setCurrentContragent($person, $person->getCurrentContragent());
 
                 return 'Done';
 

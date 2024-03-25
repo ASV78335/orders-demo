@@ -26,7 +26,9 @@ class SlugManagerTest extends AbstractTestCase
 
     public function testCreateSlug(): void
     {
+        $exception = new UnitAlreadyExistsException('');
         $unit = MockUtils::createUnit();
+
         $this->slugger->expects($this->once())
             ->method('slug')
             ->with($unit->getName())
@@ -37,7 +39,7 @@ class SlugManagerTest extends AbstractTestCase
             ->with('Test-unit')
             ->willReturn(false);
 
-        $slug = $this->createSlugManager()->createSlug($unit->getName());
+        $slug = $this->createSlugManager()->createSlug($unit->getName(), $exception);
         $this->assertEquals('Test-unit', $slug);
     }
 
@@ -45,6 +47,7 @@ class SlugManagerTest extends AbstractTestCase
     {
         $this->expectException(UnitAlreadyExistsException::class);
 
+        $exception = new UnitAlreadyExistsException('');
         $unit = MockUtils::createUnit();
 
         $this->slugger->expects($this->once())
@@ -62,11 +65,12 @@ class SlugManagerTest extends AbstractTestCase
             ->with('Test-unit')
             ->willReturn($unit->getUuid());
 
-        $this->createSlugManager()->createSlug($unit->getName());
+        $this->createSlugManager()->createSlug($unit->getName(), $exception);
     }
 
     public function testUpdateSlug(): void
     {
+        $exception = new UnitAlreadyExistsException('');
         $unit = MockUtils::createUnit();
 
         $this->slugger->expects($this->once())
@@ -79,7 +83,7 @@ class SlugManagerTest extends AbstractTestCase
             ->with('Test-unit')
             ->willReturn(false);
 
-        $slug = $this->createSlugManager()->updateSlug($unit, $unit->getName());
+        $slug = $this->createSlugManager()->updateSlug($unit, $unit->getName(), $exception);
         $this->assertEquals('Test-unit', $slug);
     }
 
@@ -88,6 +92,7 @@ class SlugManagerTest extends AbstractTestCase
         $this->expectException(UnitAlreadyExistsException::class);
 
         $uuid = new UnitUuid();
+        $exception = new UnitAlreadyExistsException('');
         $unit = MockUtils::createUnit();
 
         $this->slugger->expects($this->once())
@@ -105,7 +110,7 @@ class SlugManagerTest extends AbstractTestCase
             ->with('Test-unit')
             ->willReturn($uuid);
 
-        $this->createSlugManager()->updateSlug($unit, $unit->getName());
+        $this->createSlugManager()->updateSlug($unit, $unit->getName(), $exception);
     }
 
 

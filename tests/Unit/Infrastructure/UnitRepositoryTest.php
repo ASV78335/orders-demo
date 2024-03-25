@@ -11,7 +11,6 @@ use Symfony\Component\Uid\Uuid;
 class UnitRepositoryTest extends AbstractRepositoryTest
 {
     const UNIT_SLUG = 'Test-unit';
-    private UnitRepository $repository;
 
     protected function setUp(): void
     {
@@ -86,7 +85,7 @@ class UnitRepositoryTest extends AbstractRepositoryTest
         $this->assertEquals(['уп.', 'шт.'], $names);
     }
 
-    public function testGetNotDeletedByPage()
+    public function testGetNotDeletedByPageSortedByName()
     {
         $unit1 = MockUtils::createUnit();
         $this->setPropertyValue($unit1, 'name', 'шт.');
@@ -105,7 +104,7 @@ class UnitRepositoryTest extends AbstractRepositoryTest
         }
         $this->em->flush();
 
-        $this->assertEquals([$unit3, $unit2], $this->repository->getNotDeletedByPage(0, 2));
+        $this->assertEquals([$unit3, $unit2], $this->repository->getNotDeletedByPageSortedByName(0, 2));
     }
 
     private function createUnit(): Unit

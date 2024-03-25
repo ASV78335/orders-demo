@@ -2,7 +2,7 @@
 
 namespace App\Tests\Controller;
 
-use App\Person\Infrastructure\PersonRepository;
+use App\Repository\PersonRepository;
 use App\Tests\AbstractControllerTest;
 use App\Tests\MockUtils;
 use Exception;

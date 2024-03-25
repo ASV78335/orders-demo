@@ -2,7 +2,9 @@
 
 namespace App\Unit\Application\Query;
 
-class UnitList
+use App\Shared\Application\Query\DTOListInterface;
+
+class UnitList implements DTOListInterface
 {
     private array $items;
 
@@ -20,5 +22,13 @@ class UnitList
     public function getItems(): array
     {
         return $this->items;
+    }
+
+    /**
+     * @param UnitItem[] $items
+     */
+    public function setItems(array $items): void
+    {
+        $this->items = $items;
     }
 }

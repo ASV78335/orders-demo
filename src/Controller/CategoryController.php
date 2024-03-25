@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Attribute\RequestBody;
 use App\Category\Application\CategoryHelper;
 use App\Category\Application\Command\CategoryCommandInteractor;
 use App\Category\Application\Command\CategoryCreateCommand;
@@ -10,7 +11,6 @@ use App\Category\Application\Query\CategoryQueryInteractor;
 use App\ControllerHelper\CommandDecorator;
 use App\ControllerHelper\ControllerHelper;
 use App\ControllerHelper\DecoratorFactory;
-use App\Shared\Resources\Attribute\RequestBody;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;

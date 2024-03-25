@@ -35,7 +35,7 @@ class ProductQueryInteractorTest extends AbstractTestCase
             ->willReturn(true);
 
         $this->provider->expects($this->once())
-            ->method('getNotDeletedEntitiesSortedByName')
+            ->method('getNotDeletedEntities')
             ->willReturn([$entities['product']]);
 
         $interactor = $this->createInteractor();
@@ -49,13 +49,8 @@ class ProductQueryInteractorTest extends AbstractTestCase
     {
         $entities = $this->createEntities();
 
-        $this->accessManager->expects($this->once())
-            ->method('canView')
-            ->with($entities['person'])
-            ->willReturn(true);
-
         $this->provider->expects($this->once())
-            ->method('getNotDeletedEntitiesSortedByName')
+            ->method('getNotDeletedEntities')
             ->willReturn([]);
 
         $interactor = $this->createInteractor();
@@ -70,6 +65,10 @@ class ProductQueryInteractorTest extends AbstractTestCase
         $this->expectException(ProductAccessDeniedException::class);
 
         $entities = $this->createEntities();
+
+        $this->provider->expects($this->once())
+            ->method('getNotDeletedEntities')
+            ->willReturn([$entities['product']]);
 
         $this->accessManager->expects($this->once())
             ->method('canView')
@@ -108,11 +107,6 @@ class ProductQueryInteractorTest extends AbstractTestCase
         $start = 0;
         $count = 5;
 
-        $this->accessManager->expects($this->once())
-            ->method('canView')
-            ->with($entities['person'])
-            ->willReturn(true);
-
         $this->provider->expects($this->once())
             ->method('getNotDeletedEntitiesByPage')
             ->with($start, $count)
@@ -132,6 +126,11 @@ class ProductQueryInteractorTest extends AbstractTestCase
         $entities = $this->createEntities();
         $start = 0;
         $count = 5;
+
+        $this->provider->expects($this->once())
+            ->method('getNotDeletedEntitiesByPage')
+            ->with($start, $count)
+            ->willReturn([$entities['product']]);
 
         $this->accessManager->expects($this->once())
             ->method('canView')
@@ -170,11 +169,6 @@ class ProductQueryInteractorTest extends AbstractTestCase
         $entities = $this->createEntities();
         $uuid = Uuid::v4()->toRfc4122();
 
-        $this->accessManager->expects($this->once())
-            ->method('canView')
-            ->with($entities['person'])
-            ->willReturn(true);
-
         $this->provider->expects($this->once())
             ->method('getEntityByUuid')
             ->with($uuid)
@@ -189,12 +183,17 @@ class ProductQueryInteractorTest extends AbstractTestCase
 
         $entities = $this->createEntities();
 
+        $this->provider->expects($this->once())
+            ->method('getEntityByUuid')
+            ->with($entities['product']->getUuid()->getStringValue())
+            ->willReturn($entities['product']);
+
         $this->accessManager->expects($this->once())
             ->method('canView')
-            ->with($entities['person'])
+            ->with($entities['person'], $entities['product'])
             ->willReturn(false);
 
-        $this->createInteractor()->getItem($entities['person'], $entities['product']->getUuid());
+        $this->createInteractor()->getItem($entities['person'], $entities['product']->getUuid()->getStringValue());
     }
 
     public function testGetDetails(): void
@@ -228,11 +227,6 @@ class ProductQueryInteractorTest extends AbstractTestCase
 
         $entities = $this->createEntities();
         $uuid = Uuid::v4()->toRfc4122();
-
-        $this->accessManager->expects($this->once())
-            ->method('canView')
-            ->with($entities['person'])
-            ->willReturn(true);
 
         $this->provider->expects($this->once())
             ->method('getEntityByUuid')

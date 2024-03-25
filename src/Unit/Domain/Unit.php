@@ -2,6 +2,10 @@
 
 namespace App\Unit\Domain;
 
+use App\AbstractContainer\Domain\Entity;
+use App\Shared\Application\Command\DTOCreateInterface;
+use App\Shared\Application\Command\DTOUpdateInterface;
+use App\Shared\Application\Exception\RequestParsingException;
 use App\Unit\Application\Command\UnitCreateCommand;
 use App\Unit\Application\Command\UnitUpdateCommand;
 use App\Unit\Application\Query\UnitDetails;
@@ -12,7 +16,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\HasLifecycleCallbacks]
 #[ORM\Entity]
-class Unit
+class Unit extends Entity
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -50,9 +54,12 @@ class Unit
     }
 
 
-    public static function fromCreateRequest(UnitCreateCommand $model, array $values): self
+    public static function fromCreateRequest(DTOCreateInterface $model, array $additionalValues): self
     {
-        extract($values);
+        if (!$model instanceof UnitCreateCommand) throw new RequestParsingException();
+
+        extract($additionalValues);
+
         $unit = new self();
         $unit
             ->setUuid(new UnitUuid())
@@ -65,18 +72,21 @@ class Unit
         return $unit;
     }
 
-    public static function fromUpdateRequest(Unit $unit, UnitUpdateCommand $model, array $values): self
+    public static function fromUpdateRequest(Entity $entity, DTOUpdateInterface $model, array $additionalValues): self
     {
-        extract($values);
+        if (!$entity instanceof Unit) throw new RequestParsingException();
+        if (!$model instanceof UnitUpdateCommand) throw new RequestParsingException();
 
-        $unit
+        extract($additionalValues);
+
+        $entity
             ->setName($model->getName())
             ->setSlug($slug)
             ->setDescription($model->getDescription())
             ->setCode($model->getCode())
             ->setUpdatedAt(new DateTimeImmutable())
         ;
-        return $unit;
+        return $entity;
     }
 
     public function toResponseItem(): UnitItem
@@ -119,7 +129,7 @@ class Unit
 
         return $this;
     }
-        
+
     public function getName(): ?string
     {
         return $this->name;

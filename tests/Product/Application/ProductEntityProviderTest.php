@@ -36,7 +36,7 @@ class ProductEntityProviderTest extends AbstractTestCase
         $this->assertEquals($entities['product'], $this->createProvider()->getEntityByUuid($entities['product']->getUuid()->getStringValue()));
     }
 
-    public function testGetEntityByUuidProductNotFoundException(): void
+    public function testGetEntityByUuidCategoryNotFoundException(): void
     {
         $this->expectException(ProductNotFoundException::class);
 

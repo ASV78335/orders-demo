@@ -14,6 +14,11 @@ abstract class BaseEntityProvider implements EntityProviderInterface
 
     abstract public function getEntityByUuid(string $uuid);
 
+    public function getNotDeletedEntities(): array
+    {
+        return $this->repository->getNotDeleted();
+    }
+
     public function getNotDeletedEntitiesSortedByName(): array
     {
         return $this->repository->getNotDeletedSortedByName();
@@ -24,6 +29,10 @@ abstract class BaseEntityProvider implements EntityProviderInterface
         return $this->repository->getNotDeletedByPage($offset, $count);
     }
 
+    public function getNotDeletedEntitiesByPageSortedByName(int $offset, int $count): array
+    {
+        return $this->repository->getNotDeletedByPageSortedByName($offset, $count);
+    }
 
     public function getEntitiesByField(string $field, object $value): array
     {

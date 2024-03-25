@@ -6,9 +6,13 @@ interface EntityProviderInterface
 {
     public function getEntityByUuid(string $uuid);
 
+    public function getNotDeletedEntities(): array;
+
     public function getNotDeletedEntitiesSortedByName(): array;
 
     public function getNotDeletedEntitiesByPage(int $offset, int $count): array;
+
+    public function getNotDeletedEntitiesByPageSortedByName(int $offset, int $count): array;
 
     public function getEntitiesByField(string $field, object $value): array;
 
@@ -17,5 +21,4 @@ interface EntityProviderInterface
     public function getEntitiesByFields(array $fields, object $value): array;
 
     public function getNotDeletedEntitiesByFields(array $fields, object $value): array;
-
 }

@@ -2,7 +2,9 @@
 
 namespace App\Category\Application\Query;
 
-class CategoryList
+use App\Shared\Application\Query\DTOListInterface;
+
+class CategoryList implements DTOListInterface
 {
     private array $items;
 
@@ -20,5 +22,13 @@ class CategoryList
     public function getItems(): array
     {
         return $this->items;
+    }
+
+    /**
+     * @param CategoryItem[] $items
+     */
+    public function setItems(array $items): void
+    {
+        $this->items = $items;
     }
 }

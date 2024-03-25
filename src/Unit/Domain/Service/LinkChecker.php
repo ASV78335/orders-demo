@@ -2,29 +2,20 @@
 
 namespace App\Unit\Domain\Service;
 
-use App\OrderEntry\Application\OrderEntryEntityProvider;
-use App\PriceListEntry\Application\PriceListEntryEntityProvider;
-use App\Product\Application\ProductEntityProvider;
+use App\AbstractContainer\Domain\AbstractService\AbstractLinkChecker;
+use App\AbstractContainer\Domain\Entity;
 use App\Unit\Domain\Exception\UnitIsUsedException;
-use App\Unit\Domain\Unit;
 
-class LinkChecker
+class LinkChecker extends AbstractLinkChecker
 {
-    public function __construct(
-        private readonly OrderEntryEntityProvider $orderEntryEntityProvider,
-        private readonly PriceListEntryEntityProvider $priceListEntryEntityProvider,
-        private readonly ProductEntityProvider $productEntityProvider
-    )
+    public function check(Entity $entity): bool
     {
-    }
-    public function check(Unit $unit): bool
-    {
-        $notDeletedRelatedProducts = $this->productEntityProvider->getNotDeletedEntitiesByField('baseUnit', $unit);
-        $notDeletedRelatedPriceListEntries = $this->priceListEntryEntityProvider->getNotDeletedEntitiesByField('unit', $unit);
-        $notDeletedRelatedOrderEntries = $this->orderEntryEntityProvider->getNotDeletedEntitiesByField('unit', $unit);
+        $countNotDeletedRelatedProducts = $this->checkProducts('baseUnit', $entity);
+        $countOfUsedPriceListEntries = $this->checkPriceListEntries('unit', $entity);
+        $countOfUsedRecordEntries = $this->checkOrderEntries('unit', $entity);
 
-        $count = count($notDeletedRelatedProducts) + count($notDeletedRelatedPriceListEntries) + count($notDeletedRelatedOrderEntries);
-        if ($count > 0) throw new UnitIsUsedException($count);
+        $countOfUses = $countNotDeletedRelatedProducts + $countOfUsedPriceListEntries + $countOfUsedRecordEntries;
+        if ($countOfUses > 0) throw new UnitIsUsedException($countOfUses);
 
         return true;
     }

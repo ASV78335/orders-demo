@@ -27,6 +27,8 @@ class SlugManagerTest extends AbstractTestCase
     public function testCreateSlug(): void
     {
         $entities = $this->createEntities();
+        $exception = new ProductAlreadyExistsException('');
+
         $this->slugger->expects($this->once())
             ->method('slug')
             ->with($entities['product']->getName())
@@ -37,7 +39,7 @@ class SlugManagerTest extends AbstractTestCase
             ->with('Test-product')
             ->willReturn(false);
 
-        $slug = $this->createSlugManager()->createSlug($entities['product']->getName());
+        $slug = $this->createSlugManager()->createSlug($entities['product']->getName(), $exception);
         $this->assertEquals('Test-product', $slug);
     }
 
@@ -45,44 +47,10 @@ class SlugManagerTest extends AbstractTestCase
     {
         $this->expectException(ProductAlreadyExistsException::class);
 
-        $entities = $this->createEntities();
-
-        $this->slugger->expects($this->once())
-            ->method('slug')
-            ->with($entities['product']->getName())
-            ->willReturn(new UnicodeString('Test-product'));
-
-        $this->repository->expects($this->once())
-            ->method('existBySlug')
-            ->with('Test-product')
-            ->willReturn(true);
-
-        $this->createSlugManager()->createSlug($entities['product']->getName());
-    }
-
-    public function testUpdateSlug(): void
-    {
-        $entities = $this->createEntities();
-        $this->slugger->expects($this->once())
-            ->method('slug')
-            ->with($entities['product']->getName())
-            ->willReturn(new UnicodeString('Test-product'));
-
-        $this->repository->expects($this->once())
-            ->method('existBySlug')
-            ->with('Test-product')
-            ->willReturn(false);
-
-        $slug = $this->createSlugManager()->updateSlug($entities['product'], $entities['product']->getName());
-        $this->assertEquals('Test-product', $slug);
-    }
-
-    public function testUpdateSlugProductAlreadyExistsException(): void
-    {
-        $this->expectException(ProductAlreadyExistsException::class);
-
         $uuid = new ProductUuid();
         $entities = $this->createEntities();
+        $exception = new ProductAlreadyExistsException('');
+
         $this->slugger->expects($this->once())
             ->method('slug')
             ->with($entities['product']->getName())
@@ -98,7 +66,52 @@ class SlugManagerTest extends AbstractTestCase
             ->with('Test-product')
             ->willReturn($uuid);
 
-        $this->createSlugManager()->updateSlug($entities['product'], $entities['product']->getName());
+        $this->createSlugManager()->createSlug($entities['product']->getName(), $exception);
+    }
+
+    public function testUpdateSlug(): void
+    {
+        $entities = $this->createEntities();
+        $exception = new ProductAlreadyExistsException('');
+
+        $this->slugger->expects($this->once())
+            ->method('slug')
+            ->with($entities['product']->getName())
+            ->willReturn(new UnicodeString('Test-product'));
+
+        $this->repository->expects($this->once())
+            ->method('existBySlug')
+            ->with('Test-product')
+            ->willReturn(false);
+
+        $slug = $this->createSlugManager()->updateSlug($entities['product'], $entities['product']->getName(), $exception);
+        $this->assertEquals('Test-product', $slug);
+    }
+
+    public function testUpdateSlugProductAlreadyExistsException(): void
+    {
+        $this->expectException(ProductAlreadyExistsException::class);
+
+        $uuid = new ProductUuid();
+        $entities = $this->createEntities();
+        $exception = new ProductAlreadyExistsException('');
+
+        $this->slugger->expects($this->once())
+            ->method('slug')
+            ->with($entities['product']->getName())
+            ->willReturn(new UnicodeString('Test-product'));
+
+        $this->repository->expects($this->once())
+            ->method('existBySlug')
+            ->with('Test-product')
+            ->willReturn(true);
+
+        $this->repository->expects($this->once())
+            ->method('getUuidBySlug')
+            ->with('Test-product')
+            ->willReturn($uuid);
+
+        $this->createSlugManager()->updateSlug($entities['product'], $entities['product']->getName(), $exception);
 
     }
 

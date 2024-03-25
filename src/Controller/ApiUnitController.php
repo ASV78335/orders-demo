@@ -2,8 +2,8 @@
 
 namespace App\Controller;
 
-use App\Shared\Resources\Attribute\RequestBody;
-use App\Shared\Resources\Model\ResponseError;
+use App\Attribute\RequestBody;
+use App\Model\ResponseError;
 use App\Unit\Application\Command\UnitCommandInteractor;
 use App\Unit\Application\Command\UnitCreateCommand;
 use App\Unit\Application\Command\UnitUpdateCommand;

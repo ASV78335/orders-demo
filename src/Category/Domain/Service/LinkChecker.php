@@ -2,21 +2,16 @@
 
 namespace App\Category\Domain\Service;
 
-use App\Category\Domain\Category;
+use App\AbstractContainer\Domain\AbstractService\AbstractLinkChecker;
+use App\AbstractContainer\Domain\Entity;
 use App\Category\Domain\Exception\CategoryIsUsedException;
-use App\Product\Application\ProductEntityProvider;
 
-class LinkChecker
+class LinkChecker extends AbstractLinkChecker
 {
-    public function __construct(
-        private readonly ProductEntityProvider $productEntityProvider
-    )
+    public function check(Entity $entity): bool
     {
-    }
-    public function check(Category $category): bool
-    {
-        $notDeletedRelatedProducts = $this->productEntityProvider->getNotDeletedEntitiesByField('category', $category);
-        if (count($notDeletedRelatedProducts) > 0) throw new CategoryIsUsedException(count($notDeletedRelatedProducts));
+        $countNotDeletedRelatedProducts = $this->checkProducts('category', $entity);
+        if ($countNotDeletedRelatedProducts > 0) throw new CategoryIsUsedException($countNotDeletedRelatedProducts);
 
         return true;
     }

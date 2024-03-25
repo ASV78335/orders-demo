@@ -2,10 +2,11 @@
 
 namespace App\Shared\Infrastructure;
 
+use App\Shared\Domain\EntityRepositoryInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 
-abstract class BaseRepository
+abstract class BaseRepository implements EntityRepositoryInterface
 {
     private EntityRepository $repository;
     public function __construct(private readonly EntityManagerInterface $em, $class)
@@ -35,6 +36,14 @@ abstract class BaseRepository
         return null !== $this->repository->findOneBy(['slug' => $slug]);
     }
 
+    public function getNotDeleted(): array
+    {
+        return $this->repository->createQueryBuilder('e')
+            ->where('e.deletedAt IS NULL')
+            ->getQuery()
+            ->getResult();
+    }
+
     public function getNotDeletedSortedByName(): array
     {
         return $this->repository->createQueryBuilder('e')
@@ -45,6 +54,16 @@ abstract class BaseRepository
     }
 
     public function getNotDeletedByPage(int $offset = 0, int $limit = 10): array
+    {
+        return $this->repository->createQueryBuilder('e')
+            ->where('e.deletedAt IS NULL')
+            ->setFirstResult($offset)
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function getNotDeletedByPageSortedByName(int $offset = 0, int $limit = 10): array
     {
         return $this->repository->createQueryBuilder('e')
             ->where('e.deletedAt IS NULL')

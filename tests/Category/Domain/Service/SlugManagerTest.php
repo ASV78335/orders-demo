@@ -26,7 +26,9 @@ class SlugManagerTest extends AbstractTestCase
 
     public function testCreateSlug(): void
     {
+        $exception = new CategoryAlreadyExistsException('');
         $category = MockUtils::createCategory();
+
         $this->slugger->expects($this->once())
             ->method('slug')
             ->with($category->getName())
@@ -37,7 +39,7 @@ class SlugManagerTest extends AbstractTestCase
             ->with('Test-category')
             ->willReturn(false);
 
-        $slug = $this->createSlugManager()->createSlug($category->getName());
+        $slug = $this->createSlugManager()->createSlug($category->getName(), $exception);
         $this->assertEquals('Test-category', $slug);
     }
 
@@ -45,6 +47,7 @@ class SlugManagerTest extends AbstractTestCase
     {
         $this->expectException(CategoryAlreadyExistsException::class);
 
+        $exception = new CategoryAlreadyExistsException('');
         $category = MockUtils::createCategory();
 
         $this->slugger->expects($this->once())
@@ -62,11 +65,12 @@ class SlugManagerTest extends AbstractTestCase
             ->with('Test-category')
             ->willReturn($category->getUuid());
 
-        $this->createSlugManager()->createSlug($category->getName());
+        $this->createSlugManager()->createSlug($category->getName(), $exception);
     }
 
     public function testUpdateSlug(): void
     {
+        $exception = new CategoryAlreadyExistsException('');
         $category = MockUtils::createCategory();
 
         $this->slugger->expects($this->once())
@@ -79,7 +83,7 @@ class SlugManagerTest extends AbstractTestCase
             ->with('Test-category')
             ->willReturn(false);
 
-        $slug = $this->createSlugManager()->updateSlug($category, $category->getName());
+        $slug = $this->createSlugManager()->updateSlug($category, $category->getName(), $exception);
         $this->assertEquals('Test-category', $slug);
     }
 
@@ -88,6 +92,7 @@ class SlugManagerTest extends AbstractTestCase
         $this->expectException(CategoryAlreadyExistsException::class);
 
         $uuid = new CategoryUuid();
+        $exception = new CategoryAlreadyExistsException('');
         $category = MockUtils::createCategory();
 
         $this->slugger->expects($this->once())
@@ -105,7 +110,7 @@ class SlugManagerTest extends AbstractTestCase
             ->with('Test-category')
             ->willReturn($uuid);
 
-        $this->createSlugManager()->updateSlug($category, $category->getName());
+        $this->createSlugManager()->updateSlug($category, $category->getName(), $exception);
     }
 
 

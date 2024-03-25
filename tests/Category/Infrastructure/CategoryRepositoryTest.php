@@ -11,7 +11,6 @@ use Symfony\Component\Uid\Uuid;
 class CategoryRepositoryTest extends AbstractRepositoryTest
 {
     const CATEGORY_SLUG = 'Test-category';
-    private CategoryRepository $repository;
 
     protected function setUp(): void
     {
@@ -86,7 +85,7 @@ class CategoryRepositoryTest extends AbstractRepositoryTest
         $this->assertEquals(['Батоны', 'Хлеб'], $names);
     }
 
-    public function testGetNotDeletedByPage()
+    public function testGetNotDeletedByPageSortedByName()
     {
         $category1 = MockUtils::createCategory();
         $this->setPropertyValue($category1, 'name', 'Хлеб');
@@ -105,7 +104,7 @@ class CategoryRepositoryTest extends AbstractRepositoryTest
         }
         $this->em->flush();
 
-        $this->assertEquals([$category2, $category3], $this->repository->getNotDeletedByPage(0, 2));
+        $this->assertEquals([$category2, $category3], $this->repository->getNotDeletedByPageSortedByName(0, 2));
     }
 
     private function createCategory(): Category

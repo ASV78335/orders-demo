@@ -2,13 +2,21 @@
 
 namespace App\Tests\Unit\Domain\Service;
 
+use App\Shared\Application\EntityProvider;
 use App\Unit\Domain\Service\AccessManager;
 use App\Tests\AbstractTestCase;
 use App\Tests\MockUtils;
 
 class AccessManagerTest extends AbstractTestCase
 {
+    private readonly EntityProvider $provider;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->provider = $this->createMock(EntityProvider::class);
+    }
     public function testCanEditAssertFalse(): void
     {
         $person = MockUtils::createPerson();
@@ -28,21 +36,24 @@ class AccessManagerTest extends AbstractTestCase
 
     public function testCanViewAssertFalse(): void
     {
-        $response = $this->createAccessManager()->canView(null);
+        $unit = MockUtils::createUnit();
+
+        $response = $this->createAccessManager()->canView(null, $unit);
         $this->assertFalse($response);
     }
 
     public function testCanViewAssertTrue(): void
     {
         $person = MockUtils::createPerson();
+        $unit = MockUtils::createUnit();
 
-        $response = $this->createAccessManager()->canView($person);
+        $response = $this->createAccessManager()->canView($person, $unit);
         $this->assertTrue($response);
     }
 
     private function createAccessManager(): AccessManager
     {
-        return new AccessManager();
+        return new AccessManager($this->provider);
     }
 
 }

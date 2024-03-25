@@ -3,6 +3,8 @@
 namespace App\Tests\Product\Application\Command;
 
 use App\Category\Application\CategoryEntityProvider;
+use App\Category\Application\Command\CategoryCreateCommand;
+use App\Category\Application\Command\CategoryUpdateCommand;
 use App\Product\Application\Command\ProductCommandInteractor;
 use App\Product\Application\Command\ProductCreateCommand;
 use App\Product\Application\Command\ProductUpdateCommand;
@@ -13,6 +15,7 @@ use App\Product\Domain\Service\AccessManager;
 use App\Product\Domain\Service\LinkChecker;
 use App\Product\Domain\Service\SlugManager;
 use App\Product\Infrastructure\ProductRepository;
+use App\Shared\Application\Exception\RequestParsingException;
 use App\Tests\AbstractTestCase;
 use App\Tests\MockUtils;
 use App\Unit\Application\UnitEntityProvider;
@@ -53,7 +56,7 @@ class ProductCommandInteractorTest extends AbstractTestCase
         ;
 
         $this->accessManager->expects($this->once())
-            ->method('canEdit')
+            ->method('canCreate')
             ->with($entities['person'])
             ->willReturn(true);
 
@@ -94,9 +97,24 @@ class ProductCommandInteractorTest extends AbstractTestCase
         ;
 
         $this->accessManager->expects($this->once())
-            ->method('canEdit')
+            ->method('canCreate')
             ->with($entities['person'])
             ->willReturn(false);
+
+        $this->createInteractor()->create($entities['person'], $request);
+    }
+
+    public function testCreateRequestParsingException(): void
+    {
+        $this->expectException(RequestParsingException::class);
+
+        $entities = $this->createEntities();
+
+        $request = (new CategoryCreateCommand())
+            ->setName('Test category')
+            ->setDescription('Test category description')
+            ->setCode('1100')
+        ;
 
         $this->createInteractor()->create($entities['person'], $request);
     }
@@ -166,6 +184,21 @@ class ProductCommandInteractorTest extends AbstractTestCase
             ->willReturn(false);
 
         $this->createInteractor()->update($entities['person'], $request, $entities['product']->getUuid()->getStringValue());
+    }
+
+    public function testUpdateRequestParsingException(): void
+    {
+        $this->expectException(RequestParsingException::class);
+
+        $entities = $this->createEntities();
+
+        $request = (new CategoryUpdateCommand())
+            ->setName('Test category')
+            ->setDescription('Test category description')
+            ->setCode('1100')
+        ;
+
+        $this->createInteractor()->update($entities['person'], $request, $entities['category']->getUuid()->getStringValue());
     }
 
     public function testDelete()

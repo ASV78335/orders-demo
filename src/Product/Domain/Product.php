@@ -2,14 +2,18 @@
 
 namespace App\Product\Domain;
 
+use App\AbstractContainer\Domain\Entity;
 use App\Category\Domain\Category;
-use App\Image\Domain\Image;
-use App\ProductCharacteristic\Domain\ProductCharacteristic;
+use App\Entity\Image;
+use App\Entity\ProductCharacteristic;
 use App\Product\Application\Command\ProductCreateCommand;
 use App\Product\Application\Command\ProductUpdateCommand;
 use App\Product\Application\Query\ProductDetails;
 use App\Product\Application\Query\ProductItem;
 use App\Product\Domain\ValueObject\ProductUuid;
+use App\Shared\Application\Command\DTOCreateInterface;
+use App\Shared\Application\Command\DTOUpdateInterface;
+use App\Shared\Application\Exception\RequestParsingException;
 use App\Unit\Domain\Unit;
 use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -18,7 +22,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\HasLifecycleCallbacks]
 #[ORM\Entity]
-class Product
+class Product extends Entity
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -76,9 +80,12 @@ class Product
     }
 
 
-    public static function fromCreateRequest(ProductCreateCommand $model, array $values): self
+    public static function fromCreateRequest(DTOCreateInterface $model, array $additionalValues): self
     {
-        extract($values);
+        if (!$model instanceof ProductCreateCommand) throw new RequestParsingException();
+
+        extract($additionalValues);
+
         $product = new self();
         $product
             ->setUuid(new ProductUuid())
@@ -93,10 +100,14 @@ class Product
         return $product;
     }
 
-    public static function fromUpdateRequest(Product $product, ProductUpdateCommand $model, array $values): self
+    public static function fromUpdateRequest(Entity $entity, DTOUpdateInterface $model, array $additionalValues): self
     {
-        extract($values);
-        $product
+        if (!$entity instanceof Product) throw new RequestParsingException();
+        if (!$model instanceof ProductUpdateCommand) throw new RequestParsingException();
+
+        extract($additionalValues);
+
+        $entity
             ->setName($model->getName())
             ->setSlug($slug)
             ->setDescription($model->getDescription())
@@ -105,7 +116,7 @@ class Product
             ->setBaseUnit($baseUnit)
             ->setUpdatedAt(new DateTimeImmutable())
         ;
-        return $product;
+        return $entity;
     }
 
     public function toResponseItem(): ProductItem

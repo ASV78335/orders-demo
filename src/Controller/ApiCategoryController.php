@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Attribute\RequestBody;
 use App\Category\Application\Command\CategoryCommandInteractor;
 use App\Category\Application\Command\CategoryCreateCommand;
 use App\Category\Application\Command\CategoryUpdateCommand;
@@ -9,8 +10,7 @@ use App\Category\Application\Query\CategoryDetails;
 use App\Category\Application\Query\CategoryItem;
 use App\Category\Application\Query\CategoryList;
 use App\Category\Application\Query\CategoryQueryInteractor;
-use App\Shared\Resources\Attribute\RequestBody;
-use App\Shared\Resources\Model\ResponseError;
+use App\Model\ResponseError;
 use Nelmio\ApiDocBundle\Annotation\Model;
 use OpenApi\Attributes as OA;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;

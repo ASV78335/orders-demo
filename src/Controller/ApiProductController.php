@@ -2,15 +2,15 @@
 
 namespace App\Controller;
 
+use App\Attribute\RequestBody;
+use App\Model\Product\ProductList;
+use App\Model\ResponseError;
 use App\Product\Application\Command\ProductCommandInteractor;
 use App\Product\Application\Command\ProductCreateCommand;
 use App\Product\Application\Command\ProductUpdateCommand;
 use App\Product\Application\Query\ProductDetails;
 use App\Product\Application\Query\ProductItem;
-use App\Product\Application\Query\ProductList;
 use App\Product\Application\Query\ProductQueryInteractor;
-use App\Shared\Resources\Attribute\RequestBody;
-use App\Shared\Resources\Model\ResponseError;
 use Nelmio\ApiDocBundle\Annotation\Model;
 use OpenApi\Attributes as OA;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;

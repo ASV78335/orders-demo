@@ -2,24 +2,24 @@
 
 namespace App\Tests\Product\Domain\Service;
 
-use App\OrderEntry\Application\OrderEntryEntityProvider;
-use App\PriceListEntry\Application\PriceListEntryEntityProvider;
+use App\Product\Application\ProductEntityProvider;
 use App\Product\Domain\Exception\ProductIsUsedException;
 use App\Product\Domain\Service\LinkChecker;
+use App\Shared\Application\EntityProvider;
 use App\Tests\AbstractTestCase;
 use App\Tests\MockUtils;
 
 class LinkCheckerTest extends AbstractTestCase
 {
-    private readonly OrderEntryEntityProvider $orderEntryEntityProvider;
-    private readonly PriceListEntryEntityProvider $priceListEntryEntityProvider;
+    private readonly EntityProvider $entityProvider;
+    private readonly ProductEntityProvider $productEntityProvider;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->orderEntryEntityProvider = $this->createMock(OrderEntryEntityProvider::class);
-        $this->priceListEntryEntityProvider = $this->createMock(PriceListEntryEntityProvider::class);
+        $this->entityProvider = $this->createMock(EntityProvider::class);
+        $this->productEntityProvider = $this->createMock(ProductEntityProvider::class);
     }
 
     public function testCheck(): void
@@ -28,15 +28,12 @@ class LinkCheckerTest extends AbstractTestCase
         $unit = MockUtils::createUnit();
         $product = MockUtils::createProduct($category, $unit);
 
-        $this->orderEntryEntityProvider->expects($this-once())
+        $this->entityProvider->expects($this->any())
             ->method('getNotDeletedEntitiesByField')
-            ->with('product', $product)
-            ->willReturn([]);
-
-        $this->priceListEntryEntityProvider->expects($this-once())
-            ->method('getNotDeletedEntitiesByField')
-            ->with('product', $product)
-            ->willReturn([]);
+            ->will($this->returnValueMap([
+                ['App\Entity\PriceListEntry', 'product', $product, []],
+                ['App\Entity\RecordEntry', 'product', $product, []]
+            ]));
 
         $this->assertTrue($this->createService()->check($product));
     }
@@ -51,18 +48,15 @@ class LinkCheckerTest extends AbstractTestCase
         $person = MockUtils::CreatePerson();
         $contragent = MockUtils::createContragent();
         $shop = MockUtils::CreateShop(null, $contragent, null);
-        $order = MockUtils::createOrder($person, $shop);
-        $orderEntry = MockUtils::createOrderEntry($order, $product, $unit, $person);
+        $record = MockUtils::createRecord($person, $shop);
+        $recordEntry = MockUtils::createRecordEntry($record, $product, $unit, $person);
 
-        $this->orderEntryEntityProvider->expects($this-once())
+        $this->entityProvider->expects($this->any())
             ->method('getNotDeletedEntitiesByField')
-            ->with('product', $product)
-            ->willReturn([]);
-
-        $this->priceListEntryEntityProvider->expects($this-once())
-            ->method('getNotDeletedEntitiesByField')
-            ->with('product', $product)
-            ->willReturn([$orderEntry]);
+            ->will($this->returnValueMap([
+                ['App\Entity\PriceListEntry', 'product', $product, []],
+                ['App\Entity\RecordEntry', 'product', $product, [$recordEntry]]
+            ]));
 
         $this->createService()->check($product);
     }
@@ -70,8 +64,8 @@ class LinkCheckerTest extends AbstractTestCase
     private function createService(): LinkChecker
     {
         return new LinkChecker(
-            $this->orderEntryEntityProvider,
-            $this->priceListEntryEntityProvider
+            $this->entityProvider,
+            $this->productEntityProvider
         );
     }
 }
